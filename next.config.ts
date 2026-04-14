@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
-import type { Compiler } from "webpack";
 
 class VeliteWebpackPlugin {
   static started = false;
-  apply(compiler: Compiler) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  apply(compiler: any) {
     compiler.hooks.beforeCompile.tapPromise("VeliteWebpackPlugin", async () => {
       if (VeliteWebpackPlugin.started) return;
       VeliteWebpackPlugin.started = true;
