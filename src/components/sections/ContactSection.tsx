@@ -1,6 +1,12 @@
 'use client';
 import { useState } from 'react';
 
+const LINKS = [
+  { icon: '@',  label: 'contacto@enece.cl',         href: 'mailto:contacto@enece.cl',             external: false },
+  { icon: 'gh', label: 'GitHub · EneCe',             href: 'https://github.com/neftalicr',         external: true  },
+  { icon: 'in', label: 'LinkedIn · Neftali Carrillo', href: 'https://linkedin.com/in/neftalicr', external: true  },
+];
+
 export function ContactSection() {
   const [form, setForm] = useState({ nombre: '', email: '', servicio: '', mensaje: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -16,84 +22,95 @@ export function ContactSection() {
       return;
     }
     setStatus('sending');
-    // TODO: conectar con endpoint de contacto (Resend / Formspree)
     await new Promise(r => setTimeout(r, 800));
     setStatus('sent');
   };
 
   const inputStyle: React.CSSProperties = {
-    background: 'var(--glass)',
+    background: 'var(--bg2)',
     border: '1px solid var(--border)',
-    borderRadius: 6,
-    padding: '12px 16px',
+    borderRadius: 4,
+    padding: '11px 14px',
     color: 'var(--cream)',
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: '0.9rem',
+    fontFamily: 'var(--font-space-grotesk), sans-serif',
+    fontSize: '0.88rem',
     outline: 'none',
     width: '100%',
+    transition: 'border-color 0.2s',
   };
 
   const labelStyle: React.CSSProperties = {
-    fontSize: '0.65rem',
-    letterSpacing: '0.2em',
+    fontFamily: 'var(--font-mono), monospace',
+    fontSize: '0.6rem',
+    letterSpacing: '0.18em',
     textTransform: 'uppercase',
     color: 'var(--muted)',
-    marginBottom: 6,
+    marginBottom: 5,
     display: 'block',
   };
 
   return (
     <section id="contacto">
-      <span className="section-label">Hablemos</span>
-      <h2 className="section-title">Contacto</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }}>
+      <span className="section-label">contacto</span>
+      <h2 className="section-title">Hablemos</h2>
 
+      <div className="contact-grid">
+
+        {/* Left: info */}
         <div>
           <p style={{ color: 'var(--muted)', fontSize: '1rem', lineHeight: 1.8, marginBottom: 32 }}>
             ¿Tienes un proyecto, una idea o una necesidad concreta? Me interesa escucharte. Trabajo con empresas y personas que quieren hacer algo real con tecnología e IA.
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {[
-              { icon: '✉', label: 'contacto@enece.cl', href: 'mailto:contacto@enece.cl' },
-              { icon: '⌥', label: 'GitHub · EneCe', href: 'https://github.com/neftalicr', target: '_blank' },
-              { icon: '⬡', label: 'LinkedIn · Neftali Carrillo', href: 'https://linkedin.com/in/neftalicr', target: '_blank' },
-            ].map(link => (
-              <a key={link.label} href={link.href} target={(link as { target?: string }).target}
-                rel={(link as { target?: string }).target === '_blank' ? 'noopener noreferrer' : undefined}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {LINKS.map(link => (
+              <a
+                key={link.label}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
                   color: 'var(--cream)',
                   textDecoration: 'none',
-                  fontSize: '0.88rem',
+                  fontSize: '0.85rem',
                   padding: '14px 18px',
                   border: '1px solid var(--border)',
-                  borderRadius: 8,
+                  borderRadius: 6,
                   background: 'var(--glass)',
-                  backdropFilter: 'blur(10px)',
                   transition: 'border-color 0.2s, transform 0.2s',
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--orange)';
-                  (e.currentTarget as HTMLAnchorElement).style.transform = 'translateX(4px)';
+                  e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)';
+                  e.currentTarget.style.transform = 'translateX(4px)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)';
-                  (e.currentTarget as HTMLAnchorElement).style.transform = 'translateX(0)';
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.transform = 'translateX(0)';
                 }}
               >
-                <span style={{ color: 'var(--orange)', fontSize: '1rem', width: 20 }}>{link.icon}</span>
+                <span style={{
+                  fontFamily: 'var(--font-mono), monospace',
+                  fontSize: '0.7rem',
+                  color: 'var(--accent)',
+                  width: 20,
+                  textAlign: 'center',
+                  fontWeight: 700,
+                }}>
+                  {link.icon}
+                </span>
                 {link.label}
               </a>
             ))}
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {/* Right: form */}
+        <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
-            { key: 'nombre', label: 'Nombre', type: 'text', placeholder: 'Tu nombre' },
-            { key: 'email', label: 'Email', type: 'email', placeholder: 'tu@email.com' },
+            { key: 'nombre', label: 'Nombre',  type: 'text',  placeholder: 'Tu nombre',    autocomplete: 'name' },
+            { key: 'email',  label: 'Email',   type: 'email', placeholder: 'tu@email.com', autocomplete: 'email' },
           ].map(f => (
             <div key={f.key}>
               <label htmlFor={f.key} style={labelStyle}>{f.label}</label>
@@ -101,21 +118,28 @@ export function ContactSection() {
                 id={f.key}
                 type={f.type}
                 placeholder={f.placeholder}
+                autoComplete={f.autocomplete}
+                aria-required="true"
                 style={inputStyle}
                 value={form[f.key as keyof typeof form]}
                 onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                onFocus={e => (e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)')}
+                onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
               />
             </div>
           ))}
+
           <div>
             <label htmlFor="servicio" style={labelStyle}>¿En qué puedo ayudarte?</label>
             <select
               id="servicio"
-              style={{ ...inputStyle, appearance: 'none' as const }}
+              style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
               value={form.servicio}
               onChange={e => setForm(p => ({ ...p, servicio: e.target.value }))}
+              onFocus={e => (e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)')}
+              onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
             >
-              <option value="">Selecciona una opción</option>
+              <option value="">Selecciona</option>
               <option>Gestión con IA</option>
               <option>Desarrollo de aplicación</option>
               <option>Consultoría digital</option>
@@ -123,48 +147,91 @@ export function ContactSection() {
               <option>Otro</option>
             </select>
           </div>
+
           <div>
             <label htmlFor="mensaje" style={labelStyle}>Mensaje</label>
             <textarea
               id="mensaje"
+              aria-required="true"
               style={{ ...inputStyle, minHeight: 100, resize: 'vertical' }}
-              placeholder="Cuéntame sobre tu proyecto o necesidad..."
+              placeholder="Cuéntame sobre tu proyecto o necesidad…"
               value={form.mensaje}
               onChange={e => setForm(p => ({ ...p, mensaje: e.target.value }))}
+              onFocus={e => (e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)')}
+              onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
             />
           </div>
+
           <button
             type="submit"
             disabled={status === 'sending' || status === 'sent'}
             style={{
-              background: 'var(--orange)',
-              color: '#000',
-              border: 'none',
-              padding: '14px 32px',
+              background: status === 'sent' ? 'transparent' : 'var(--accent)',
+              color: status === 'sent' ? 'var(--green)' : '#000',
+              border: status === 'sent' ? '1px solid rgba(34,197,94,0.4)' : 'none',
+              padding: '12px 28px',
               borderRadius: 4,
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '0.85rem',
-              fontWeight: 500,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase' as const,
-              cursor: status === 'sending' ? 'wait' : 'pointer',
+              fontFamily: 'var(--font-mono), monospace',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              cursor: status === 'sending' || status === 'sent' ? 'default' : 'pointer',
               alignSelf: 'flex-start',
-              opacity: status === 'sent' ? 0.7 : 1,
+              transition: 'background 0.3s, color 0.3s',
+            }}
+            onMouseEnter={e => {
+              if (status === 'idle') (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent2)';
+            }}
+            onMouseLeave={e => {
+              if (status === 'idle') (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent)';
             }}
           >
-            {status === 'idle' && 'Enviar mensaje'}
-            {status === 'sending' && 'Enviando...'}
-            {status === 'sent' && '¡Mensaje enviado!'}
-            {status === 'error' && 'Error — reintentar'}
+            {status === 'idle'    && 'enviar_mensaje()'}
+            {status === 'sending' && 'ejecutando...'}
+            {status === 'sent'    && '✓ enviado'}
+            {status === 'error'   && 'reintentar'}
           </button>
-          {status === 'error' && (
-            <p style={{ color: 'var(--orange)', fontSize: '0.78rem' }}>
-              Por favor completa todos los campos con un email válido.
-            </p>
-          )}
+
+          <div role="status" aria-live="polite" aria-atomic="true">
+            {status === 'error' && (
+              <p style={{
+                fontFamily: 'var(--font-mono), monospace',
+                color: 'var(--amber)',
+                fontSize: '0.7rem',
+                marginTop: 4,
+              }}>
+                // completa nombre, email válido y mensaje.
+              </p>
+            )}
+            {status === 'sent' && (
+              <p style={{
+                fontFamily: 'var(--font-mono), monospace',
+                color: 'var(--green2)',
+                fontSize: '0.7rem',
+                marginTop: 4,
+              }}>
+                // mensaje recibido. respondo pronto.
+              </p>
+            )}
+          </div>
         </form>
 
       </div>
+
+      <style>{`
+        .contact-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 80px;
+          align-items: start;
+        }
+        @media (max-width: 768px) {
+          .contact-grid {
+            grid-template-columns: 1fr;
+            gap: 48px;
+          }
+        }
+      `}</style>
     </section>
   );
 }

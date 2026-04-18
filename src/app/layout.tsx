@@ -1,28 +1,23 @@
 import type { Metadata } from "next";
-import { DM_Sans, Rajdhani } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ChatWidget } from "@/components/chatbot/ChatWidget";
 
-// DM Sans — body text
-const dmSans = DM_Sans({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
-  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
   display: "swap",
 });
 
-// Rajdhani — wordmark y service titles
-const rajdhani = Rajdhani({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-rajdhani",
+  weight: ["400", "500", "700"],
+  variable: "--font-mono",
   display: "swap",
 });
-
-// Nota: Bebas Neue no está disponible en next/font/google — se mantiene como @import en globals.css SOLO para Bebas Neue
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://enece.cl"),
@@ -36,7 +31,7 @@ export const metadata: Metadata = {
     locale: "es_CL",
     url: process.env.NEXT_PUBLIC_SITE_URL,
     siteName: "ENECE",
-    description: "Soluciones que piensan y ejecutan. Gestión de procesos, inteligencia artificial y desarrollo de aplicaciones para tu negocio.",
+    description: "Soluciones que piensan y ejecutan.",
     images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "ENECE — Gestión · IA · Desarrollo" }],
   },
   twitter: {
@@ -47,9 +42,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${dmSans.variable} ${rajdhani.variable}`}>
+    <html lang="es" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body>
-        <div className="mesh" />
         <Header />
         {children}
         <Footer />

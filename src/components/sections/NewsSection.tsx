@@ -2,85 +2,131 @@
 
 const NEWS = [
   {
-    date: 'Abril 2026',
+    date: 'abr 2026',
+    category: 'gestión',
     title: 'Agentes autónomos en la gestión de procesos empresariales',
-    excerpt: 'Los agentes de IA están transformando cómo las empresas automatizan decisiones repetitivas, liberando equipos para trabajo de mayor valor.',
-    category: 'Gestión',
+    excerpt: 'Los agentes de IA transforman cómo las empresas automatizan decisiones repetitivas, liberando equipos para trabajo de mayor valor.',
+    href: '#',
   },
   {
-    date: 'Marzo 2026',
+    date: 'mar 2026',
+    category: 'desarrollo',
     title: 'Google Antigravity redefine el desarrollo de software con IA',
-    excerpt: 'El nuevo IDE agéntico de Google permite que múltiples agentes trabajen en paralelo, multiplicando la productividad de equipos pequeños.',
-    category: 'Desarrollo',
+    excerpt: 'El nuevo IDE agéntico permite que múltiples agentes trabajen en paralelo, multiplicando la productividad de equipos pequeños.',
+    href: '#',
   },
   {
-    date: 'Marzo 2026',
+    date: 'mar 2026',
+    category: 'IA & trabajo',
     title: 'El perfil del desarrollador en 2026: estratega más que programador',
-    excerpt: 'La IA asume la implementación técnica. El diferencial humano es ahora la visión de negocio, el criterio y la capacidad de orquestar agentes.',
-    category: 'IA & Trabajo',
+    excerpt: 'La IA asume la implementación técnica. El diferencial humano es la visión de negocio y la capacidad de orquestar agentes.',
+    href: '#',
   },
 ];
 
 export function NewsSection() {
   return (
     <section id="ia-noticias">
-      <span className="section-label">Actualidad</span>
+      <span className="section-label">blog</span>
       <h2 className="section-title">IA para la Gestión</h2>
+
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: 16,
       }}>
         {NEWS.map((n, i) => (
-          <div key={i} style={{
-            background: 'var(--glass)',
-            border: '1px solid var(--border)',
-            borderRadius: 10,
-            padding: '28px 24px',
-            backdropFilter: 'blur(10px)',
-            cursor: 'pointer',
-            transition: 'border-color 0.3s, transform 0.3s',
-          }}
+          <article
+            key={i}
+            style={{
+              background: 'var(--bg2)',
+              border: '1px solid var(--border)',
+              borderRadius: 8,
+              padding: '28px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'border-color 0.3s, transform 0.3s',
+            }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,107,0,0.35)';
-              (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)';
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,130,246,0.35)';
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)';
-              (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
             }}
           >
-            <div style={{ fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: 'var(--orange)', marginBottom: 12, opacity: 0.7 }}>
-              {n.date}
-            </div>
+            {/* Top row: date + tag */}
             <div style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              fontSize: '1.05rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 16,
+            }}>
+              <span style={{
+                fontFamily: 'var(--font-mono), monospace',
+                fontSize: '0.6rem',
+                color: 'var(--muted)',
+                letterSpacing: '0.1em',
+              }}>
+                {n.date}
+              </span>
+              <span style={{
+                fontFamily: 'var(--font-mono), monospace',
+                fontSize: '0.55rem',
+                color: 'var(--accent)',
+                border: '1px solid rgba(59,130,246,0.2)',
+                padding: '2px 7px',
+                borderRadius: 2,
+                letterSpacing: '0.06em',
+              }}>
+                {n.category}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h3 style={{
+              fontSize: '1rem',
               fontWeight: 600,
               color: 'var(--cream)',
               lineHeight: 1.4,
               marginBottom: 10,
-              letterSpacing: '0.04em',
             }}>
               {n.title}
-            </div>
-            <p style={{ fontSize: '0.82rem', color: 'var(--muted)', lineHeight: 1.65 }}>
+            </h3>
+
+            {/* Excerpt */}
+            <p style={{
+              fontSize: '0.82rem',
+              color: 'var(--muted)',
+              lineHeight: 1.65,
+              flex: 1,
+            }}>
               {n.excerpt}
             </p>
-            <span style={{
-              display: 'inline-block',
-              marginTop: 16,
-              fontSize: '0.58rem',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase' as const,
-              color: 'var(--orange)',
-              border: '1px solid rgba(255,107,0,0.2)',
-              padding: '2px 8px',
-              borderRadius: 2,
-            }}>
-              {n.category}
-            </span>
-          </div>
+
+            {/* CTA */}
+            <a
+              href={n.href}
+              aria-label={`Leer más: ${n.title}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                marginTop: 20,
+                fontFamily: 'var(--font-mono), monospace',
+                fontSize: '0.65rem',
+                color: 'var(--accent)',
+                textDecoration: 'none',
+                letterSpacing: '0.06em',
+                transition: 'gap 0.2s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.gap = '10px')}
+              onMouseLeave={e => (e.currentTarget.style.gap = '6px')}
+            >
+              leer más →
+            </a>
+          </article>
         ))}
       </div>
     </section>

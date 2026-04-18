@@ -24,6 +24,10 @@ export function ChatWidget() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
+  useEffect(() => {
+    if (open) setTimeout(() => textareaRef.current?.focus(), 50);
+  }, [open]);
+
   const send = async () => {
     const text = input.trim();
     if (!text || loading) return;
@@ -45,9 +49,7 @@ export function ChatWidget() {
         }),
       });
 
-      if (!res.ok || !res.body) {
-        throw new Error('Error del servidor');
-      }
+      if (!res.ok || !res.body) throw new Error('Error del servidor');
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -82,102 +84,146 @@ export function ChatWidget() {
     }
   };
 
+  const canSend = input.trim() && !loading;
+
   return (
     <>
-      {/* Panel de chat */}
+      {/* Chat panel */}
       {open && (
         <div
           role="dialog"
           aria-label="Chat con ENECE"
+          aria-modal="true"
           style={{
             position: 'fixed',
-            bottom: 90,
-            right: 28,
-            width: 380,
-            height: 520,
+            bottom: 84,
+            right: 24,
+            width: 'min(360px, calc(100vw - 32px))',
+            height: 500,
             zIndex: 200,
             display: 'flex',
             flexDirection: 'column',
-            background: 'rgba(17,19,16,0.95)',
-            border: '1px solid rgba(255,107,0,0.2)',
-            borderRadius: 16,
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,107,0,0.05)',
+            background: 'var(--bg2)',
+            border: '1px solid rgba(59,130,246,0.25)',
+            borderRadius: 10,
             overflow: 'hidden',
+            boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
           }}
         >
           {/* Header */}
           <div style={{
-            padding: '16px 20px',
-            borderBottom: '1px solid rgba(255,107,0,0.12)',
+            padding: '14px 16px',
+            borderBottom: '1px solid var(--border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexShrink: 0,
+            background: 'var(--bg3)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {/* V1 logo mark mini */}
               <div style={{
-                width: 8, height: 8, borderRadius: '50%',
-                background: '#22c55e',
-                boxShadow: '0 0 6px #22c55e',
-              }} />
-              <span style={{
-                fontFamily: "'Rajdhani', sans-serif",
-                fontWeight: 700,
-                fontSize: '1rem',
-                letterSpacing: '0.12em',
-                color: '#e8ddd0',
-                textTransform: 'uppercase',
+                width: 28,
+                height: 28,
+                border: '1.5px solid var(--accent)',
+                borderRadius: 4,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                flexShrink: 0,
               }}>
-                ENECE · Asistente
-              </span>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', display: 'block' }} />
+              </div>
+              <div>
+                <span style={{
+                  fontFamily: 'var(--font-mono), monospace',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.12em',
+                  color: 'var(--cream)',
+                  display: 'block',
+                  lineHeight: 1.2,
+                }}>
+                  ENECE.assistant
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                  <span style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    background: 'var(--green)',
+                    animation: 'pulse-dot 2s ease infinite',
+                    display: 'inline-block',
+                  }} />
+                  <span style={{
+                    fontFamily: 'var(--font-mono), monospace',
+                    fontSize: '0.55rem',
+                    color: 'var(--green2)',
+                    letterSpacing: '0.08em',
+                  }}>
+                    online
+                  </span>
+                </span>
+              </div>
             </div>
+
             <button
               onClick={() => setOpen(false)}
               aria-label="Cerrar chat"
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#6b7060',
+                color: 'var(--muted)',
                 cursor: 'pointer',
-                fontSize: '1.1rem',
-                lineHeight: 1,
-                padding: 4,
+                fontSize: '0.9rem',
+                padding: '6px',
+                borderRadius: 3,
+                transition: 'color 0.2s',
               }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--cream)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted)')}
             >
               ✕
             </button>
           </div>
 
-          {/* Mensajes */}
-          <div style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '16px 16px 8px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-          }}>
+          {/* Messages */}
+          <div
+            role="log"
+            aria-live="polite"
+            aria-label="Mensajes del chat"
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+            }}
+          >
             {messages.map((m, i) => (
               <div key={i} style={{
                 display: 'flex',
                 justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
               }}>
                 <div style={{
-                  maxWidth: '82%',
-                  padding: '10px 14px',
-                  borderRadius: m.role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
+                  maxWidth: '80%',
+                  padding: '9px 13px',
+                  borderRadius: m.role === 'user'
+                    ? '8px 8px 2px 8px'
+                    : '8px 8px 8px 2px',
                   background: m.role === 'user'
-                    ? 'rgba(255,107,0,0.15)'
-                    : 'rgba(255,255,255,0.04)',
+                    ? 'rgba(59,130,246,0.15)'
+                    : 'var(--bg3)',
                   border: m.role === 'user'
-                    ? '1px solid rgba(255,107,0,0.3)'
-                    : '1px solid rgba(255,255,255,0.06)',
-                  color: m.role === 'user' ? '#e8ddd0' : '#b8b4ae',
-                  fontSize: '0.85rem',
+                    ? '1px solid rgba(59,130,246,0.3)'
+                    : '1px solid var(--border)',
+                  color: m.role === 'user' ? 'var(--cream)' : 'var(--muted)',
+                  fontSize: '0.82rem',
                   lineHeight: 1.6,
                   whiteSpace: 'pre-wrap',
+                  fontFamily: 'var(--font-space-grotesk), sans-serif',
                 }}>
                   {m.content || (m.role === 'assistant' && (
                     <span style={{ opacity: 0.5 }}>▋</span>
@@ -190,20 +236,16 @@ export function ChatWidget() {
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <div style={{
                   padding: '10px 14px',
-                  borderRadius: '12px 12px 12px 4px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: '8px 8px 8px 2px',
+                  background: 'var(--bg3)',
+                  border: '1px solid var(--border)',
                 }}>
-                  <span style={{
-                    display: 'inline-flex',
-                    gap: 4,
-                    alignItems: 'center',
-                  }}>
+                  <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
                     {[0, 1, 2].map(j => (
                       <span key={j} style={{
                         width: 5, height: 5, borderRadius: '50%',
-                        background: '#FF6B00',
-                        opacity: 0.6,
+                        background: 'var(--accent)',
+                        opacity: 0.7,
                         animation: `bounce 1s ease ${j * 0.15}s infinite`,
                         display: 'inline-block',
                       }} />
@@ -217,8 +259,8 @@ export function ChatWidget() {
 
           {/* Input */}
           <div style={{
-            padding: '12px 16px',
-            borderTop: '1px solid rgba(255,107,0,0.12)',
+            padding: '10px 12px',
+            borderTop: '1px solid var(--border)',
             display: 'flex',
             gap: 8,
             flexShrink: 0,
@@ -229,91 +271,94 @@ export function ChatWidget() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Escribe un mensaje..."
+              placeholder="$ escribe un mensaje..."
               disabled={loading}
+              aria-label="Mensaje para el asistente"
               style={{
                 flex: 1,
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,107,0,0.15)',
-                borderRadius: 8,
-                padding: '8px 12px',
-                color: '#e8ddd0',
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '0.85rem',
+                background: 'var(--bg3)',
+                border: '1px solid var(--border)',
+                borderRadius: 4,
+                padding: '8px 11px',
+                color: 'var(--cream)',
+                fontFamily: 'var(--font-space-grotesk), sans-serif',
+                fontSize: '0.82rem',
                 outline: 'none',
                 resize: 'none',
                 lineHeight: 1.5,
+                transition: 'border-color 0.2s',
               }}
+              onFocus={e => (e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)')}
+              onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
             />
             <button
               onClick={send}
-              disabled={loading || !input.trim()}
+              disabled={!canSend}
               aria-label="Enviar mensaje"
               style={{
-                background: input.trim() && !loading ? '#FF6B00' : 'rgba(255,107,0,0.2)',
+                background: canSend ? 'var(--accent)' : 'rgba(59,130,246,0.1)',
                 border: 'none',
-                borderRadius: 8,
-                width: 38,
-                height: 38,
-                cursor: input.trim() && !loading ? 'pointer' : 'default',
+                borderRadius: 4,
+                width: 36,
+                height: 36,
+                cursor: canSend ? 'pointer' : 'default',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                transition: 'background 0.2s',
                 alignSelf: 'flex-end',
+                transition: 'background 0.2s',
               }}
+              onMouseEnter={e => { if (canSend) (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent2)'; }}
+              onMouseLeave={e => { if (canSend) (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent)'; }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M22 2L11 13" stroke={input.trim() && !loading ? '#000' : '#FF6B00'} strokeWidth="2" strokeLinecap="round"/>
-                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke={input.trim() && !loading ? '#000' : '#FF6B00'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"
+                  stroke={canSend ? '#000' : 'var(--accent)'}
+                  strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>
         </div>
       )}
 
-      {/* Botón flotante */}
+      {/* FAB */}
       <button
         onClick={() => setOpen(o => !o)}
-        aria-label={open ? 'Cerrar chat' : 'Abrir chat'}
+        aria-label={open ? 'Cerrar chat' : 'Abrir asistente ENECE'}
         style={{
           position: 'fixed',
-          bottom: 28,
-          right: 28,
-          width: 54,
-          height: 54,
-          borderRadius: '50%',
-          background: '#FF6B00',
-          border: 'none',
+          bottom: 24,
+          right: 24,
+          width: 48,
+          height: 48,
+          borderRadius: 6,
+          background: open ? 'var(--bg3)' : 'var(--accent)',
+          border: open ? '1px solid var(--border)' : 'none',
           cursor: 'pointer',
           zIndex: 200,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 24px rgba(255,107,0,0.4)',
+          boxShadow: open
+            ? '0 4px 20px rgba(0,0,0,0.4)'
+            : '0 4px 20px rgba(59,130,246,0.4)',
           transition: 'transform 0.2s, background 0.2s',
         }}
-        onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.08)')}
+        onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.06)')}
         onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
       >
         {open ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6l12 12" stroke="#000" strokeWidth="2.5" strokeLinecap="round"/>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="var(--cream)" strokeWidth="2.5" strokeLinecap="round"/>
           </svg>
         ) : (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         )}
       </button>
-
-      <style>{`
-        @keyframes bounce {
-          0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
-          40% { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
     </>
   );
 }
